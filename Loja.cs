@@ -1,49 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StoreManager
 {
     public class Loja
     {
         public List<CarrinhoDeCompras> Carrinhos { get; set; } = new List<CarrinhoDeCompras>();
-        public List<Produto> Produtos { get; set; } = new List<Produto>();
+        private List<Produto> _produtos { get; set; } = new List<Produto>();
 
         public int DetermineID()
         {
-            if (Produtos.Count == 0)
+            return _produtos.Count == 0 ? 1 : _produtos.Max(p => p.ID) + 1;
+        }
+
+        public int DetermineIDCarrinho()
+        {
+            return Carrinhos.Count == 0 ? 1 : Carrinhos.Max(p => p.ID) + 1;
+        }
+
+        public void ListarCarrinhos()
+        {
+            Console.WriteLine("ID                   EMAIL");
+            foreach (var carrinho in Carrinhos)
             {
-                return 1;
-            }
-            else
-            {
-                return Produtos.Max(p => p.ID) + 1;
+                Console.WriteLine($"{carrinho.ID}                   {carrinho.UserEmail}");
             }
         }
 
-
-
         public void CadastraProduto(int quantidade, string nome)
         {
-            //Console.WriteLine("Digite o nome do produto: ");
-            //var nome = Console.ReadLine();
-
-            //Console.WriteLine("Digite a quantidade deste produto no estoque: ");
-            //var quantidade = int.Parse(Console.ReadLine());
-
-
             Produto novoProduto = new Produto(quantidade, nome, this);
-
-            Produtos.Add(novoProduto);
+            _produtos.Add(novoProduto);
         }
 
         public void ListarProdutos()
         {
             Console.WriteLine("ID                   NOME                    QUANTIDADE");
-            foreach (var produto in Produtos)
+            foreach (var produto in _produtos)
             {
                 Console.WriteLine($"{produto.ID}                    {produto.Nome}                  {produto.Quantidade}");
             }
@@ -51,32 +45,7 @@ namespace StoreManager
 
         public Produto CopyCat(int id)
         {
-            foreach (var produto in Produtos)
-            {
-                if(produto.ID == id)
-                {
-                    return produto;
-                }
-            }
-            return null;
+            return _produtos.FirstOrDefault(p => p.ID == id);
         }
-
-        public bool ReduzirEstoque(Produto produtoreduce)
-        {
-            foreach(var produto in Produtos)
-            {
-                if (produto.ID == produtoreduce.ID)
-                {
-                    if(produto.Quantidade >= produtoreduce.Quantidade)
-                    {
-                        produto.Quantidade -= produtoreduce.Quantidade;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-
     }
 }
